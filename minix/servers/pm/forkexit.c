@@ -57,6 +57,7 @@ do_fork(void)
   * way through is such a nuisance.
   */
   rmp = mp;
+
   if ((procs_in_use == NR_PROCS) ||
   		(procs_in_use >= NR_PROCS-LAST_FEW && rmp->mp_effuid != 0))
   {
@@ -119,6 +120,7 @@ do_fork(void)
   new_pid = get_free_pid();
   rmc->mp_pid = new_pid;	/* assign pid to child */
 
+
   memset(&m, 0, sizeof(m));
   m.m_type = VFS_PM_FORK;
   m.VFS_PM_ENDPT = rmc->mp_endpoint;
@@ -136,6 +138,7 @@ do_fork(void)
   /* Do not reply until VFS is ready to process the fork
   * request
   */
+  printf("Minix: PID %d created",rmp->mp_pid);
   return SUSPEND;
 }
 
@@ -250,6 +253,7 @@ do_exit(void)
   * do not use PM's exit() to terminate. If they try to, we warn the user
   * and send a SIGKILL signal to the system process.
   */
+
   if(mp->mp_flags & PRIV_PROC) {
       printf("PM: system process %d (%s) tries to exit(), sending SIGKILL\n",
           mp->mp_endpoint, mp->mp_name);
@@ -258,6 +262,7 @@ do_exit(void)
   else {
       exit_proc(mp, m_in.m_lc_pm_exit.status, FALSE /*dump_core*/);
   }
+  printf("Minix: PID %d exited",mp->mp_pid);
   return(SUSPEND);		/* can't communicate from beyond the grave */
 }
 
@@ -377,6 +382,7 @@ exit_proc(
   /* Keep the process around until VFS is finished with it. */
 
   rmp->mp_exitstatus = (char) exit_status;
+  
 
   /* For normal exits, try to notify the parent as soon as possible.
    * For core dumps, notify the parent only once the core dump has been made.
